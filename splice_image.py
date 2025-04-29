@@ -4,7 +4,7 @@ import pywt
 import matplotlib.pyplot as plt
 import sys
 
-def haar_splice_map(img_gray, wavelet='haar', level=1, win=8):
+def haar_splice_map(img_gray, wavelet='db2', level=1, win=8):
     coeffs = pywt.wavedec2(img_gray, wavelet=wavelet, level=level)
 
     energy_maps = []
