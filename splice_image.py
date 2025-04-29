@@ -14,7 +14,7 @@ def haar_splice_map(img_gray, wavelet='haar', level=1, win=8):
             sq = sub**2
             kernel = np.ones((win, win), dtype=np.float32)
             E = cv2.filter2D(sq, -1, kernel, borderType=cv2.BORDER_REFLECT)
-            E_up = cv2.resize(E, img_gray.shape, interpolation=cv2.INTER_LINEAR)
+            E_up = cv2.resize(E, (img_gray.shape[1], img_gray.shape[0]), interpolation=cv2.INTER_LINEAR)
             energy_maps.append(E_up)
             print(len(energy_maps[count]))
             count = count + 1
