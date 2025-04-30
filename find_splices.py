@@ -9,37 +9,31 @@ from scipy import stats
 from shutil import rmtree
 
 
-def find_splices(vid, alpha=0.05, wavelet="db1"):
+def find_splices(vid, alpha=0.05, wavelet="db4"):
     interval_contains = lambda i1, i2: (i1[0] <= i2[0] and i2[1] <= i1[1])
 
-    dec_len = pywt.Wavelet(wavelet).dec_len
-    level = int(np.floor(np.log(len(vid)) / np.log(dec_len)))
-
-    coeffs = pywt.wavedec(vid.astype(np.float32), axis=0, wavelet=wavelet)
+    coeffs = pywt.wavedec(vid.astype(np.float32), axis=0, wavelet=wavelet, mode="reflect")
 
     outliers = []
-    for lvl in range(level):
-        c = coeffs[lvl + 1]
-        stride = dec_len ** (level - lvl)
-        n = len(vid) // stride
-
-        if n == 1:
+    for i, c in enumerate(coeffs[1:]):
+        if len(c) == 1:
             continue
 
-        sq = np.square(c)[:n]
+        sq = np.square(c)
         if len(vid.shape) == 3:
-            sum_sq = np.sum(np.reshape(sq, (n, -1)), axis=1)
+            sum_sq = np.sum(np.reshape(sq, (len(c), -1)), axis=1)
         else:
-            sum_sq = np.sum(np.reshape(sq, (n, -1, vid.shape[-1])), axis=1)
+            sum_sq = np.sum(np.reshape(sq, (len(c), -1, vid.shape[-1])), axis=1)
 
         z = stats.zscore(sum_sq)
         p = stats.norm.sf(np.abs(z)) * 2
         if len(vid.shape) > 3:
-            p = np.min(p, axis=1)
+            p = np.sqrt(np.sum(np.square(p), axis=1))
 
         is_outlier = p < alpha
         outlier_indices = np.where(is_outlier)[0]
 
+        stride = 2 ** (len(coeffs) - i - 1)
         intervals = [(j * stride, (j + 1) * stride) for j in outlier_indices]
 
         outliers = [
