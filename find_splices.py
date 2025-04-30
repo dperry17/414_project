@@ -25,7 +25,7 @@ def find_splices(vid, alpha=0.05, wavelet="db4"):
         else:
             sum_sq = np.sum(np.reshape(sq, (len(c), -1, vid.shape[-1])), axis=1)
 
-        z = stats.zscore(sum_sq)
+        z = stats.zscore(np.sqrt(sum_sq))
         p = stats.norm.sf(np.abs(z)) * 2
         if len(vid.shape) > 3:
             p = np.sqrt(np.sum(np.square(p), axis=1))
