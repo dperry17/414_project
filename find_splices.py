@@ -33,8 +33,8 @@ def find_splices(vid, alpha=0.05, wavelet="db4"):
         is_outlier = p < alpha
         outlier_indices = np.where(is_outlier)[0]
 
-        stride = 2 ** (len(coeffs) - i - 1)
-        intervals = [(j * stride, (j + 1) * stride) for j in outlier_indices]
+        stride = len(vid) / len(c)
+        intervals = [(int(np.ceil(j * stride)), int(np.ceil((j + 1) * stride))) for j in outlier_indices]
 
         outliers = [
             (i1, *_)
