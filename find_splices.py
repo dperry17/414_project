@@ -12,7 +12,9 @@ from shutil import rmtree
 def find_splices(vid, alpha=0.05, wavelet="db4"):
     interval_contains = lambda i1, i2: (i1[0] <= i2[0] and i2[1] <= i1[1])
 
-    coeffs = pywt.wavedec(vid.astype(np.float32), axis=0, wavelet=wavelet, mode="reflect")
+    coeffs = pywt.wavedec(
+        vid.astype(np.float32), axis=0, wavelet=wavelet, mode="reflect"
+    )
 
     outliers = []
     for i, c in enumerate(coeffs[1:]):
@@ -34,7 +36,10 @@ def find_splices(vid, alpha=0.05, wavelet="db4"):
         outlier_indices = np.where(is_outlier)[0]
 
         stride = len(vid) / len(c)
-        intervals = [(int(np.floor(j * stride)), int(np.floor((j + 1) * stride))) for j in outlier_indices]
+        intervals = [
+            (int(np.floor(j * stride)), int(np.floor((j + 1) * stride)))
+            for j in outlier_indices
+        ]
 
         outliers = [
             (i1, *_)
